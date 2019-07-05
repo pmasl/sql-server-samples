@@ -1,6 +1,16 @@
 USE sales
 GO
 
+-- Create external data source for HDFS inside SQL big data cluster.
+--
+IF NOT EXISTS(SELECT * FROM sys.external_data_sources WHERE name = 'SqlStoragePool')
+    IF SERVERPROPERTY('ProductLevel') = 'CTP3.0'
+        CREATE EXTERNAL DATA SOURCE SqlStoragePool
+        WITH (LOCATION = 'sqlhdfs://controller-svc:8080/default');
+    ELSE IF SERVERPROPERTY('ProductLevel') = 'CTP3.1'
+        CREATE EXTERNAL DATA SOURCE SqlStoragePool
+        WITH (LOCATION = 'sqlhdfs://controller-svc/default');
+
 -- Create file format for CSV file with appropriate properties.
 --
 IF NOT EXISTS(SELECT * FROM sys.external_file_formats WHERE name = 'csv_file')
